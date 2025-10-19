@@ -1,0 +1,254 @@
+.send-message-page  {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 250px;
+  right: 0;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.send-message-container  {
+  flex: 1;
+  display: flex;
+  padding-left: 50px;
+  padding-right: 50px;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.form-grid {
+  display: flex;
+  gap: 50px;
+  flex-wrap: wrap;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 8px;
+  margin-left: 12px;
+  font-weight: bold;
+}
+
+/* 🔹 ช่องกรอกซ้าย (userId) */
+.form-group.small {
+  flex: 1;
+  min-width: 350px;
+}
+
+/* 🔹 ช่องกรอกขวา (message) */
+.form-group.large {
+  flex: 1.5;
+  min-width: 350px;
+}
+
+.form-group textarea {
+  width: 100%;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #aaa;
+  font-size: 14px;
+  resize: none;
+  box-sizing: border-box;
+}
+
+.form-group.small textarea {
+  min-height: 60px;
+  min-height: 200px;
+}
+
+.form-group.large textarea {
+  min-height: 380px;
+}
+
+.sending-btn-wrapper {
+  display: flex;
+  justify-content: center;
+  margin-top: 10px;
+}
+
+.btn.sending {
+  background: #00d084;
+  color: #fff;
+  border: none;
+  padding: 12px 30px;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.btn.sending:hover {
+  background: #00b874;
+}
+
+.lookup-btn-wrapper {
+  display: flex;
+  justify-content: center;
+  margin-top: 8px;
+}
+
+.lookup-status {
+  margin-top: 10px;
+  margin-left: 10px;
+  font-size: 18px;
+  text-align: start;
+}
+
+.user-not-found {
+  font-size: 15px;
+  margin-left: 10px;
+  margin-top: 8px;
+  text-overflow: ellipsis;
+  white-space: normal;
+  word-break: break-word;
+}
+
+.btn.lookup {
+  background: #0495e9;
+  color: #fff;
+  border: none;
+  padding: 12px 30px;
+  border-radius: 8px;
+  font-size: 16px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.btn.lookup:hover {
+  background: #104fa1;
+}
+
+.status-section {
+  margin-top: 2px;
+}
+
+.status-section h3 {
+  margin-bottom: 8px;
+  margin-left: 15px;
+  font-size: 22px;
+}
+
+.status-box {
+  overflow-y: auto !important;   /* ✅ บังคับเปิด scroll */
+  line-height: 1.6;
+  background: #fafafa;
+  border: 1px solid #aaa;
+  border-radius: 8px;
+  min-width: 350px;
+  min-height: 300px;
+  max-height: 500px;
+  font-size: 14px;
+  white-space: pre-wrap;
+}
+.textarea-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.textarea-wrapper textarea {
+  width: 100%;
+  padding: 12px 50px 12px 12px; /* ขวา 40px เพื่อให้มีที่สำหรับปุ่มกล้อง */
+  box-sizing: border-box;
+}
+
+.image-upload-btn {
+  position: absolute;
+  bottom: 12px;
+  right: 12px;
+  cursor: pointer;
+  font-size: 20px;
+  opacity: 0.7;
+  transition: 0.2s;
+  z-index: 10;
+}
+
+.image-upload-btn:hover {
+  opacity: 1;
+  color: #007bff;
+}
+.status-box p {
+  margin: 5px 0;
+  padding-left: 8px;
+}
+
+.status-box::-webkit-scrollbar {
+  width: 8px;
+}
+
+.status-box::-webkit-scrollbar-thumb {
+  background-color: #ccc;
+  border-radius: 4px;
+}
+
+.image-upload-btn {
+  position: absolute;
+  bottom: 10px;
+  right: 30px;
+  cursor: pointer;
+  opacity: 0.7;
+  transition: 0.2s;
+  z-index: 10;
+}
+
+.image-upload-btn:hover {
+  opacity: 1;
+  color: #007bff;
+}
+
+.preview-image {
+  position: absolute;
+  bottom: 60px;
+  right: 30px;
+  background: white;
+  border: 1px solid #ccc;
+  padding: 4px;
+  border-radius: 8px;
+  z-index: 10;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+
+.preview-image img {
+  max-width: 100px;
+  max-height: 100px;
+  display: block;
+}
+
+/* Responsive สำหรับจอแนวกว้าง */
+@media (max-height: 1000px) {
+  .send-message-page  {
+    overflow-y: auto;
+  }
+
+  .form-grid {
+    grid-template-columns: 1fr;
+    grid-gap: 50px;
+  }
+
+  .status-box {
+    margin-bottom: 20px;
+    min-height: 280px;
+    min-width: 350px;
+  }
+
+  .user-not-found {
+    font-size: 10px;
+  }
+
+  .sending-btn-wrapper,
+  .lookup-btn-wrapper {
+    justify-content: center;
+  }
+
+  .form-group.small textarea {
+    min-height: 120px;
+    min-width: 350px;
+  }
+  .form-group.large textarea {
+    min-height: 280px;
+    min-width: 350px;
+  }
+}
+
+

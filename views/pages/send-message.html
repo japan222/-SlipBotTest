@@ -1,0 +1,60 @@
+
+
+<div class="send-message-page">
+  <h1 class="page-title">ส่งข้อความ Line</h1>
+  <div class="send-message-container">
+
+  <!-- ✅ container ครอบ form -->
+    <form id="sendMessageForm" class="form-grid">
+
+      <!-- 🔍 ช่องกรอก userId -->
+      <div class="form-group small">
+        <label for="userId">ผู้รับ:</label>
+        <textarea id="userId" name="userId" maxlength="2000" rows="8" cols="50" placeholder="กรอกรหัสผู้ใช้ เช่น JPN1231234 JPN1231235
+
+* ไม่ต้องกรอกเครื่องหมายคั้น ( , | หรือ เว้นวรรค )
+
+* เพิ่มความรวดเร็ว กรอกไม่เกิน 150 รายการ" required></textarea>
+
+      <!-- ✅ ปุ่มค้นหา อยู่ตรงกลาง -->
+      <div class="lookup-btn-wrapper">
+        <button type="button" class="btn lookup" onclick="lookupUser()">ค้นหาผู้ใช้</button>
+      </div>
+
+        <!-- 🔎 แสดงผลลัพธ์ -->
+        <div id="lookup-status" class="lookup-status"></div>
+        <div id="user-not-found" class="user-not-found"></div>
+      </div>
+
+      <!-- 💬 กล่องกรอกข้อความพร้อมปุ่มเลือกรูปภาพด้านใน -->
+      <div class="form-group large">
+        <label for="message">ข้อความ:</label>
+
+          <div class="textarea-wrapper">
+            <textarea id="message" name="message" placeholder="พิมพ์ข้อความที่ต้องการส่ง ..." required></textarea>
+
+            <!-- ✅ ปุ่มอัปโหลดรูปแบบไอคอนในกล่อง -->
+            <label for="imageUpload" class="image-upload-btn" title="เลือกรูปภาพ">
+              <img src="https://img2.pic.in.th/pic/pngwing.com-1f609d0b4d431afd1.png" alt="เลือกรูปภาพ" style="width: 24px; height: 24px;">
+            </label>
+            <div id="preview-image" class="preview-image" style="display: none;">
+              <img id="preview-img" src="" alt="Preview" />
+            </div>
+
+            <input type="file" id="imageUpload" accept="image/*" style="display: none;" onchange="handleImageSelect(event)">
+          </div>
+
+        <div class="sending-btn-wrapper">
+          <button type="button" class="btn sending" onclick="sendMessageToFoundUsers(event)">ส่งข้อความ</button>
+        </div>
+      </div>
+    </form>
+
+    <!-- 📦 กล่องสถานะ -->
+    <div class="status-section">
+      <h3>สถานะการส่ง</h3>
+      <div id="statusBox" class="status-box"></div>
+    </div>
+  </div>
+<script src="/views/script/send-message.js"></script>
+

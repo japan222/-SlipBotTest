@@ -1,0 +1,81 @@
+/* ===== โครงสร้างพื้นฐานของ Body และ Layout ===== */
+body {
+  font-family: "Prompt", sans-serif;
+  overflow: hidden;          /* ไม่ให้ scroll ทั้งหน้า */
+  display: flex;             /* ใช้ flex แบ่ง sidebar กับ content */
+  margin: 0;
+  padding: 0;
+  background-color: #eeeeee;
+}
+
+.page-title {
+  text-align: center;
+  color: #2c2c2c;
+  font-size: 32px;
+  font-weight: bold;
+  margin-top: 25px;
+  margin-bottom: 35px;
+}
+
+/* ===== Sidebar (ติดจอด้านซ้าย) ===== */
+.sidebar {
+  width: 250px;
+  height: 100vh;
+  background-color: #2c2c2c;
+  color: #fff;
+  position: fixed;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  display: flex;                /* ✅ flex สำหรับจัดวาง logo + ul + footer */
+  flex-direction: column;
+  z-index: 1000;
+}
+
+.content {
+  flex: 1;
+  margin-left: 250px;
+  padding: 20px;
+  overflow-y: auto;
+  height: 100vh;
+}
+
+.sidebar .logo {
+  padding: 20px;
+  text-align: center;
+  background-color: #333;
+  font-weight: bold;
+}
+
+.sidebar ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  flex: 1;
+  overflow-y: auto; /* ✅ ให้ scroll ได้เฉพาะรายการเมนู */
+}
+
+.sidebar ul li {
+  padding: 15px 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.sidebar ul li:hover {
+  background-color: #444;
+}
+
+.sidebar .footer {
+  padding: 15px 20px;
+  text-align: center;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  background: #2c2c2c;
+  position: sticky;      /* ✅ ติดล่าง */
+  bottom: 0;
+  z-index: 10;
+}
+
+.sidebar .footer:hover {
+  background-color: #444;
+}

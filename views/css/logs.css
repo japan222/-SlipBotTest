@@ -1,0 +1,52 @@
+.logs-page {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 250px;
+  right: 0;
+  display: flex;
+  padding: 20px;
+  padding-left: 50px;
+  padding-right: 50px;
+  flex-direction: column;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.logs-container {
+  display: flex;
+  flex-direction: column;
+}
+
+.logs-wrapper-outer {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  background: white;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.logs-wrapper {
+  flex: 1;
+  overflow-y: auto;
+  padding: 10px 25px;
+  min-height: 0;
+}
+
+/* LOG แต่ละบรรทัด */
+.log-entry {
+  padding: 20px 20px;
+  border-bottom: 1px solid #eee;
+  font-size: 15px;
+  display: flex;
+  align-items: center;
+  word-break: break-word;     /* ✅ ตัดบรรทัดหากข้อความยาวเกิน */
+}
+
+/* ไม่มีเส้นคั่นบรรทัดสุดท้าย */
+.log-entry:last-child {
+  border-bottom: none;
+}

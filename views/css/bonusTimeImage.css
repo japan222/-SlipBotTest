@@ -1,0 +1,91 @@
+/* ปุ่ม custom file */
+.custom-file-btn {
+  background-color: #969696;
+  color: white;
+  padding: 6px 14px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  display: inline-block;
+}
+.custom-file-btn:hover {
+  background-color: #2e2f31;
+}
+
+.file-name {
+  max-width: 200px;        /* จำกัดความกว้าง */
+  display: inline-block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis; /* ใส่ ... ถ้ายาวเกิน */
+  vertical-align: middle;
+  margin-left: 2px;
+  font-size: 13px;
+  color: #1f1f1f;
+}
+
+/* กล่องรวม upload + ปุ่ม */
+.upload-row-column {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.bonus-row,
+.password-row {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;              /* ← ระยะห่างระหว่าง "กลุ่มสวิตช์" กับ "กลุ่มอัปโหลด" */
+}
+
+.bonus-upload .switch-label,
+.password-upload .switch-label {
+  margin-top: 15px;
+  font-size: 13px;   /* ปรับเล็กลง */
+  margin-bottom: 8px;
+  font-weight: normal; /* ถ้าอยากให้ไม่หนามาก */
+  color: #202020;       /* สีอ่อนลงเล็กน้อย */
+}
+
+/* ปุ่ม BonusTime */
+.bonus-actions,
+.password-actions {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 5px;
+}
+
+.bonus-btn-save, .bonus-btn-delete {
+  min-width: 80px;
+  padding: 6px 0;
+  margin-top: 8px;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 14px;
+  color: #fff;
+}
+
+.bonus-btn-save { background-color: #28a745; }
+.bonus-btn-save:hover { background-color: #134d20; }
+
+.bonus-btn-delete { background-color: #dc3545; }
+.bonus-btn-delete:hover { background-color: #5e161d; }
+
+.bonus-preview {
+  margin-top: 15px;
+  text-align: center;       /* จัดให้อยู่กลางแนวนอน */
+}
+
+.bonus-preview img {
+  max-width: 150px;         /* ลดขนาดภาพ (จาก 220 → 150px) */
+  max-height: 150px;        /* จำกัดความสูงด้วย */
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  display: block;           /* ให้แสดง (block จะจัดกึ่งกลางได้ง่ายกว่า inline) */
+  margin: 0 auto;           /* จัดให้อยู่กลาง block */
+  object-fit: contain;      /* ป้องกันภาพเบี้ยว รักษาสัดส่วน */
+}

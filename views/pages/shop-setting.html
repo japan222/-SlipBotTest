@@ -1,0 +1,169 @@
+<div class="shop-setting-page">
+  <div class="shop-setting-container">
+    <h1 class="page-title">จัดการร้านค้า</h1>
+    <!-- Shop list: ส่วนที่เลื่อนได้ -->
+    <div class="shop-list" id="shop-list">
+      <!-- รายการร้านค้าจะถูกเติมด้วย JavaScript -->
+    </div>
+<!-- ปุ่มเพิ่มร้านค้า -->
+<div class="footer">
+    <div class="button-group">
+        <button class="btn-add-shop" onclick="openAddShopModal()">+ เพิ่มร้านค้า</button>
+    </div>
+</div>
+
+<!-- Modal รายการบัญชี LINE -->
+<div id="shopLinesModal" class="modal">
+    <div class="showLine-modal-content">
+        <span class="modal-close" onclick="closeShopLinesModal()">&times;</span>
+        <h2 id="modal-shop-title">รายการบัญชี <strong>LINE</strong> ร้าน</h2>
+        <div id="line-list"></div> <!-- แสดงรายการบัญชี LINE -->
+        <button class="btn-add-line" onclick="addNewLine()">+ เพิ่มบัญชีไลน์</button>
+    </div>
+</div>
+
+
+<!-- Modal เพิ่มบัญชี LINE -->
+<div id="addLineModal" class="modal">
+    <div class="Line-modal-content">
+        <span class="modal-close" onclick="closeAddLineModal()">&times;</span>
+        <h2>
+            <div class="modal-header">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/41/LINE_logo.svg/120px-LINE_logo.svg.png" width="40px" />
+                <strong>เพิ่ม LINE ให้ร้าน <span id="shopNameTitle"></span></strong>
+            </div>
+        </h2>
+
+        <div class="input-group">
+            <label>Channel ID</label>
+            <input type="text" id="newChannelID">
+        </div>
+
+        <div class="input-group">
+            <label>Secret Token</label>
+            <input type="text" id="newSecretToken">
+        </div>
+        <div id="alertMessageAddline" class="alert-message-Line"></div>
+        <button class="btn-line-save" onclick="saveNewLine()">บันทึก</button>
+    </div>
+</div>
+
+<!-- Modal แก้ไขบัญชี LINE -->
+<div id="editLineModal" class="modal">
+    <div class="Line-modal-content">
+        <span class="modal-close" onclick="closeEditLineModal()">&times;</span>
+        <h2>แก้ไขบัญชี LINE</h2>
+
+        <div class="input-group">
+            <label>Channel ID</label>
+            <input type="text" id="editChannelID">
+        </div>
+
+        <div class="input-group">
+            <label>Secret Token</label>
+            <input type="text" id="editSecretToken">
+        </div>
+        <div id="alertMessageEditLine" class="alert-message-Line"></div>
+        <button class="btn-line-save" onclick="saveEditedLine()">บันทึก</button>
+    </div>
+</div>
+<!-- Modal แก้ไขร้านค้า -->
+<div id="editShopModal" class="modal">
+    <div class="editShop-modal-content">
+      <span class="modal-close" onclick="closeEditShopModal()">&times;</span>
+      <h2>แก้ไขร้านค้า</h2>
+  
+      <div class="input-group">
+        <label>ชื่อร้าน:</label>
+        <input type="text" id="editShopName">
+      </div>
+  
+      <div class="input-group">
+        <label>Prefix:</label>
+        <input type="text" id="editShopPrefix" disabled>
+      </div>
+      <div id="alertMessageEditShop" class="alert-message-Shop"></div>
+      <button class="btn-shop-save" onclick="saveShopChanges()">บันทึก</button>
+    </div>
+  </div>
+
+<!-- Modal สำหรับเพิ่มร้านค้า -->
+<div id="addShopModal" class="modal">
+    <div class="addShop-modal-content">
+        <!-- ปุ่มปิด Modal (X) -->
+        <span class="modal-close" onclick="closeAddShopModal()">&times;</span>
+
+        <h2>เพิ่มร้านค้า</h2>
+
+        <div class="input-group">
+            <label>ชื่อร้าน:</label>
+            <input type="text" id="shopName">
+        </div>
+
+        <div class="input-group">
+            <label>Prefix:</label>
+            <input type="text" id="shopPrefix">
+        </div>
+        <div id="alertMessageShop" class="alert-message-Shop"></div>
+
+        <button class="btn-shop-save" onclick="addShop()">บันทึก</button>
+    </div>
+</div>
+
+<!-- Modal การตั้งค่าบอทร้าน -->
+<div id="shopSetbotModal" class="modal shopSetbot-modal">
+    <div class="shopSetbot-modal-content">
+      <span class="modal-close" onclick="closeShopSetBotModal()">&times;</span>
+      <h2 id="shopSetbotTitle" class="shopSetbotTitle"></h2>
+      <div id="shopSetbotBody">
+        <!-- ใส่รายละเอียดร้านเพิ่มเติมที่นี่ในอนาคต -->
+      </div>
+    </div>
+  </div>
+
+<!-- Modal แสดงข้อมูลธนาคาร -->  
+<div id="bankModal" class="modal bank-modal">
+    <div class="bank-modal-content">
+        <span class="modal-close" onclick="closeBankModal()">&times;</span>
+        <h2 id="BankTitle" class="BankTitle">รายการบัญชีธนาคารร้าน:</h2>
+      <div id="bank-list"></div>
+    </div>
+  </div>
+
+  <!-- Modal เพิ่มบัญชีธนาคาร -->
+  <div id="addbankModal" class="modal">
+    <div class="add-bank-modal-content">
+        <span class="modal-close" onclick="closeAddBankModal()">&times;</span>
+        <h2 id="lineShopNameTitle" class="lineShopNameTitle">เพิ่มบัญชีธนาคารสำหรับร้าน:</h2>
+        <div class="input-group">
+          <label for="bankAccountName">ชื่อบัญชี:</label>
+          <input type="text" id="bankAccountName" placeholder="กรอกชื่อบัญชี (ไม่ต้องใส่คำหน้าชื่อ)">
+        </div>
+        <div class="input-group">
+          <label for="bankAccountNumber">เลขบัญชี:</label>
+          <input type="text" id="bankAccountNumber" placeholder="กรอกเลขบัญชี (ไม่ต้องเว้นวรรค)">
+        </div>
+        <div id="alertMessageAddBank" class="alert-message-Bank"></div>
+        <button class="btn btn-shop-save" onclick="saveNewBank()">บันทึก</button>
+    </div>
+</div>
+
+<div id="editbankModal" class="modal">
+    <div class="edit-bank-modal-content">
+        <span class="modal-close" onclick="closeEditBankModal()">&times;</span>
+        <h2 id="EditBankTitle" class="EditBankTitle">แก้ไขธนาคาร</h2>
+        <div class="input-group">
+          <label for="editBankAccountName">ชื่อบัญชี:</label>
+          <input type="text" id="editBankAccountName" placeholder="กรอกชื่อบัญชี">
+        </div>
+        <div class="input-group">
+          <label for="editBankAccountNumber">เลขบัญชี:</label>
+          <input type="text" id="editBankAccountNumber" placeholder="กรอกเลขบัญชี (ไม่ต้องเว้นวรรค)">
+        </div>
+        <div id="alertMessageEditBank" class="alert-message-Bank"></div>
+        <button class="btn btn-shop-save" onclick="saveEditedBank()">บันทึก</button>
+    </div>
+</div>
+</div>
+  </div> <!-- ปิด .shop-setting-page -->
+<script src="/views/script/shop-setting.js"></script>
