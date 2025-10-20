@@ -215,6 +215,39 @@
   display: block;
 }
 
+.image-preview-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+.delete-image-btn {
+  position: absolute;
+  top: -10px;
+  right: -10px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: rgba(255, 0, 0, 0.8);
+  color: white;
+  border: none;
+  cursor: pointer;
+  display: none;
+  font-size: 18px;
+  line-height: 1;
+  padding: 0;
+  opacity: 0;
+  transition: opacity 0.2s ease-in-out;
+}
+
+.image-preview-wrapper:hover .delete-image-btn {
+  display: block;
+  opacity: 1;
+}
+
+.delete-image-btn:hover {
+  background: rgba(255, 0, 0, 1);
+}
+
 /* Responsive สำหรับจอแนวกว้าง */
 @media (max-height: 1000px) {
   .send-message-page  {

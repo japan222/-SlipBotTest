@@ -12,6 +12,6 @@ const ImageSchema = new mongoose.Schema({
   }
 });
 
-ImageSchema.index({ uploadedAt: 1 }, { expireAfterSeconds: 3600 });
+ImageSchema.index({ uploadedAt: 1 }, { expireAfterSeconds: 300 });
 
 export default mongoose.model("UploadedImage", ImageSchema);

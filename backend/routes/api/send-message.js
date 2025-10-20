@@ -84,101 +84,131 @@ router.post('/user-lookup-batch', async (req, res) => {
   }
 });
 
-router.post('/send-message', uploadsendimage.fields([ { name: 'image', maxCount: 1 } ]), async (req, res) => {
-  const { userId, message } = req.body;
-  const sessionId = req.sessionID;
-  const username = req.session?.user?.username;
+router.post('/send-message', uploadsendimage.fields([{ name: 'image', maxCount: 1 }]), async (req, res) => {
+    const { userId, message } = req.body;
+    const sessionId = req.sessionID;
+    const username = req.session?.user?.username;
 
     if (!userId)
-      return res.status(400).json({ success: false, error: "Missing userId" });
+        return res.status(400).json({ success: false, error: "Missing userId" });
 
     if (!username || !sessionId)
-      return res.status(400).json({ success: false, error: "Missing session or username" });
+        return res.status(400).json({ success: false, error: "Missing session or username" });
 
     try {
-      // ---------------- ค้นหาร้าน ----------------
-      const phone = await Phone.findOne({ userId });
-      if (!phone || !phone.prefix)
-        return res.status(404).json({ success: false, error: "User not found in database" });
+        const phone = await Phone.findOne({ userId });
+        if (!phone || !phone.prefix)
+            return res.status(404).json({ success: false, error: "User not found in database" });
 
-      const shop = await Shop.findOne({ prefix: phone.prefix });
-      if (!shop || !shop.lines || shop.lines.length === 0)
-        return res.status(404).json({ success: false, error: "No LINE OA found for shop" });
+        const shop = await Shop.findOne({ prefix: phone.prefix });
+        if (!shop || !shop.lines || shop.lines.length === 0)
+            return res.status(404).json({ success: false, error: "No LINE OA found for shop" });
 
-      // ---------------- เตรียมรูป (หากมี) ----------------
-      let imageUrl = null;
-      const uploadedImage = await UploadedImage.findOne({ username, sessionId });
-      if (uploadedImage) {
-        // cache_bust กัน cache
-        console.log("have PIC")
-        imageUrl = `${baseURL}/api/uploaded-image?username=${encodeURIComponent(username)}&sessionId=${encodeURIComponent(sessionId)}&cache_bust=${Date.now()}`;
-        console.log(`${imageUrl}`)
-      }
-
-      if (!imageUrl && !message) {
-        return res.status(400).json({ success: false, error: "Missing message and image" });
-      }
-
-      // ---------------- ส่งข้อความหรือรูป ----------------
-      for (const lineInfo of shop.lines) {
-        const client = new line.Client({ channelAccessToken: lineInfo.access_token });
-
-        try {
-          // ถ้ามีรูป → ส่งรูปก่อน
-          if (imageUrl) {
-            await client.pushMessage(userId, {
-              type: "image",
-              originalContentUrl: imageUrl,
-              previewImageUrl: imageUrl,
+        // เตรียมรูปภาพ (ถ้ามีรูปใหม่เท่านั้น)
+        let imageUrl = null;
+        let uploadedImage = null;
+        
+        // เช็คเฉพาะกรณีมีรูปใหม่ส่งมาเท่านั้น
+        if (req.files?.image?.[0]) {
+            uploadedImage = await UploadedImage.create({
+                username,
+                sessionId,
+                data: req.files.image[0].buffer,
+                contentType: req.files.image[0].mimetype,
+                uploadedAt: new Date()
             });
-          }
-          // ถ้ามีข้อความ → ส่งต่อท้าย
-          if (message) {
-            await client.pushMessage(userId, { type: "text", text: message });
-          }
-
-          // ส่งสำเร็จ → ลบรูปของ session นี้ทิ้ง (กันส่งซ้ำ)
-          if (imageUrl) {
-            await UploadedImage.deleteOne({ username, sessionId });
-          }
-
-          broadcastLog(
-            `📨 ส่ง ${imageUrl ? 'ภาพ' : ''}${imageUrl && message ? ' + ' : ''}${message ? 'ข้อความ' : ''} จาก ${username} ไปยัง ${userId} ผ่านร้าน ${lineInfo.linename}`
-          );
-
-          return res.json({
-            success: true,
-            usedLine: lineInfo.linename,
-            shopName: shop.name,
-            type: imageUrl && message ? "image+text" : (imageUrl ? "image" : "text"),
-          });
-
-        } catch (err) {
-          console.warn(`❌ ไม่สามารถส่งผ่าน ${lineInfo.linename}:`, err.message);
-          // ลอง OA ถัดไป
+            
+            const timestamp = Date.now();
+            imageUrl = `${baseURL}/api/uploaded-image?username=${encodeURIComponent(username)}&sessionId=${encodeURIComponent(sessionId)}&cache_bust=${timestamp}`;
         }
-      }
-      // ทุก OA ส่งไม่สำเร็จ
-      return res.status(500).json({
-        success: false,
-        error: "ไม่สามารถส่งข้อความหรือภาพผ่าน LINE OA ใด ๆ ได้",
-      });
+
+        if (!imageUrl && !message) {
+            return res.status(400).json({ success: false, error: "Missing message and image" });
+        }
+
+        // ส่งข้อความและรูปภาพ
+        for (const lineInfo of shop.lines) {
+            const client = new line.Client({ channelAccessToken: lineInfo.access_token });
+
+            try {
+                // ส่งรูปก่อน (ถ้ามี)
+                let imageSent = false;
+
+                if (imageUrl) {
+                    try {
+                        await client.pushMessage(userId, {
+                            type: "image",
+                            originalContentUrl: imageUrl,
+                            previewImageUrl: imageUrl
+                        });
+                        
+                        // รอให้ LINE ดึงรูปไปก่อน
+                        await UploadedImage.deleteOne({ username, sessionId });
+                        await new Promise(resolve => setTimeout(resolve, 5000));
+                        imageSent = true;
+                    } catch (error) {
+                        console.error('❌ ไม่สามารถส่งรูปภาพ:', error);
+                    }
+                }
+                
+                // ส่งข้อความ (ถ้ามี)
+                if (message) {
+                    await client.pushMessage(userId, { 
+                        type: "text", 
+                        text: message 
+                    });
+                }
+
+                // หลังส่งเสร็จทั้งหมด ถ้าส่งรูปสำเร็จให้ลบรูปจากฐานข้อมูล
+                if (imageSent) {
+                    try {
+                        await UploadedImage.deleteMany({ sessionId });
+                    } catch (error) {
+                        console.error('❌ เกิดข้อผิดพลาดในการลบรูปภาพจากฐานข้อมูล:', error);
+                    }
+                }
+
+                broadcastLog(
+                    `📨 ส่ง ${imageSent ? 'ภาพ' : ''}${imageSent && message ? ' + ' : ''}${message ? 'ข้อความ' : ''} จาก ${username} ไปยัง ${userId} ผ่านร้าน ${lineInfo.linename}`
+                );
+
+                return res.json({
+                    success: true,
+                    usedLine: lineInfo.linename,
+                    shopName: shop.name,
+                    type: imageSent && message ? "image+text" : (imageSent ? "image" : "text")
+                });
+
+            } catch (err) {
+                console.error(`❌ ไม่สามารถส่งผ่าน ${lineInfo.linename}:`, err);
+                console.error('Error details:', err.response?.data || err.message);
+                
+                // ส่ง log ให้ admin ทราบ
+                broadcastLog(
+                    `❌ ส่งไม่สำเร็จ: ${userId} (${err.message}) - ลองส่งผ่าน ${lineInfo.linename} ไม่ได้`
+                );
+            }
+        }
+
+        return res.status(500).json({
+            success: false,
+            error: "ไม่สามารถส่งข้อความหรือภาพผ่าน LINE OA ใด ๆ ได้"
+        });
 
     } catch (err) {
-      console.error("❌ send-message error:", err);
-      return res.status(500).json({ success: false, error: "Server error" });
+        console.error("❌ send-message error:", err);
+        return res.status(500).json({ success: false, error: "Server error" });
     }
-  }
-);
+});
 
 router.post("/upload-send-image-line", uploadsendimage.single("image"), async (req, res) => {
   try {
-    // ❌ ปฏิเสธทันทีหากไม่มีไฟล์
+    // ปฏิเสธทันทีหากไม่มีไฟล์
     if (!req.file || !req.file.buffer) {
       return res.status(400).json({ error: "ไม่พบไฟล์ภาพที่ส่งมา หรือไฟล์ไม่ถูกต้อง" });
     }
 
-    // ✅ อนุญาตเฉพาะ mimetype ที่ LINE รองรับ
+    // อนุญาตเฉพาะ mimetype ที่ LINE รองรับ
     const allowedTypes = ["image/jpeg", "image/png", "image/webp", "image/jpg"];
     if (!allowedTypes.includes(req.file.mimetype)) {
       return res.status(400).json({ error: "รองรับเฉพาะไฟล์ภาพเท่านั้น" });
@@ -213,7 +243,6 @@ router.post("/upload-send-image-line", uploadsendimage.single("image"), async (r
       fileId: result._id.toString(),
     });
   } catch (error) {
-    console.error("❌ upload error:", error);
     res.status(500).json({ error: error.message || "เกิดข้อผิดพลาดระหว่างอัปโหลด" });
   }
 });

@@ -19,47 +19,99 @@ window.addEventListener("beforeunload", async () => {
   }
 });
 
-async function handleImageSelect(event) {
-  const file = event.target.files[0];
+async function removeImage() {
   const previewImg = document.getElementById('preview-img');
   const previewWrapper = document.getElementById('preview-image');
+  const imageInput = document.getElementById('imageUpload');
 
-  if (!file) return;
+  // เคลียร์ค่าต่างๆ
+  uploadedImageURL = null;
+  previewImg.src = '';
+  previewWrapper.style.display = 'none';
+  imageInput.value = '';
 
-  // แสดง preview ทันที (Base64)
-  const reader = new FileReader();
-  reader.onload = function (e) {
-    uploadedImageURL = e.target.result;
-    previewImg.src = uploadedImageURL;
-    previewWrapper.style.display = 'none'; // ซ่อนไว้ก่อนจนกว่าจะอัปโหลดสำเร็จ
-  };
-  reader.readAsDataURL(file);
-
-  // เรียกอัปโหลดทันที
   try {
-    const formData = new FormData();
-    formData.append('image', file);
-
-    const response = await fetch('/api/upload-send-image-line', {
-      method: 'POST',
-      body: formData,
-      credentials: 'include'  // ✅ เพื่อส่ง cookie session ไปด้วย
+    // ลบรูปภาพจาก server
+    const res = await fetch("/api/delete-my-upload", {
+      method: "DELETE",
+      credentials: "include"
     });
 
-    const data = await response.json();
-
-    if (response.ok && data.success) {
-      console.log("✅ อัปโหลดสำเร็จ:", data);
-      previewWrapper.style.display = 'block';
-      previewImg.title = `ดูภาพ (ID: ${data.fileId || ''})`;
-      alert('อัปโหลดเรียบร้อยแล้ว!');
-    } else {
-      console.error('❌ อัปโหลดล้มเหลว:', data);
-      alert('อัปโหลดล้มเหลว โปรดลองใหม่');
+    if (!res.ok) {
+      console.warn("ไม่สามารถลบรูปภาพจาก server ได้");
     }
   } catch (err) {
-    console.error('❌ Upload error:', err);
-    alert('เกิดข้อผิดพลาดในการอัปโหลด');
+    console.error("❌ Error ในการลบรูปภาพ:", err);
+  }
+}
+
+async function handleImageSelect(event) {
+  try {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const previewImg = document.getElementById('preview-img');
+    const previewWrapper = document.getElementById('preview-image');
+    
+    // ตรวจสอบประเภทไฟล์
+    const allowedTypes = ["image/jpeg", "image/png", "image/webp", "image/jpg"];
+    if (!allowedTypes.includes(file.type)) {
+      alert('กรุณาเลือกไฟล์รูปภาพเท่านั้น (JPG, PNG, WebP)');
+      event.target.value = ''; // เคลียร์การเลือกไฟล์
+      return;
+    }
+
+    // ตรวจสอบขนาดไฟล์ (ไม่เกิน 10MB)
+    if (file.size > 20 * 1024 * 1024) {
+      alert('ขนาดไฟล์ต้องไม่เกิน 20MB');
+      event.target.value = '';
+      return;
+    }
+
+    // แสดง preview
+    const reader = new FileReader();
+    reader.onload = async function(e) {
+      try {
+        uploadedImageURL = e.target.result;
+        previewImg.src = uploadedImageURL;
+        previewWrapper.style.display = 'none';
+
+        // อัปโหลดไฟล์
+        const formData = new FormData();
+        formData.append('image', file);
+
+        const response = await fetch('/api/upload-send-image-line', {
+          method: 'POST',
+          body: formData,
+          credentials: 'include'
+        });
+
+        const data = await response.json();
+
+        if (response.ok && data.success) {
+          console.log("✅ อัปโหลดสำเร็จ:", data);
+          previewWrapper.style.display = 'block';
+          previewImg.title = `ID: ${data.fileId || ''})`;
+          alert('อัปโหลดเรียบร้อยแล้ว!');
+        } else {
+          throw new Error(data.error || 'อัปโหลดล้มเหลว');
+        }
+      } catch (uploadError) {
+        console.error('❌ Upload error:', uploadError);
+        alert(uploadError.message || 'เกิดข้อผิดพลาดในการอัปโหลด');
+        // เคลียร์ preview และ input เมื่อเกิด error
+        previewImg.src = '';
+        previewWrapper.style.display = 'none';
+        event.target.value = '';
+        uploadedImageURL = null;
+      }
+    };
+
+    reader.readAsDataURL(file);
+  } catch (err) {
+    console.error('❌ General error:', err);
+    alert('เกิดข้อผิดพลาดในการจัดการไฟล์');
+    event.target.value = '';
   }
 }
 
@@ -173,12 +225,28 @@ async function sendMessageToFoundUsers(event) {
 
       // ✅ ถ้ามีรูปภาพ ให้ดึง blob จาก URL แล้วแนบไป
       if (uploadedImageURL) {
-        const response = await fetch(uploadedImageURL);
-        const blob = await response.blob();
-        const contentType = blob.type || "image/jpeg";
-        const extension = contentType.split("/")[1] || "jpg";
+        try {
+          const response = await fetch(uploadedImageURL);
+          if (!response.ok) {
+            throw new Error("ไม่สามารถโหลดรูปภาพได้");
+          }
+          const blob = await response.blob();
+          console.log("Blob size:", blob.size);
+          console.log("Blob type:", blob.type);
+          const contentType = blob.type || "image/jpeg";
+          const extension = contentType.split("/")[1] || "jpg";
 
-        formData.append("image", blob, `uploaded-image.${extension}`);
+          if (blob.size === 0) {
+            throw new Error("รูปภาพไม่มีข้อมูล");
+          }
+          if (blob.size > 10 * 1024 * 1024) { // 10MB
+            throw new Error("รูปภาพมีขนาดใหญ่เกินไป (เกิน 10MB)");
+          }
+
+          formData.append("image", blob, `uploaded-image.${extension}`);
+        } catch (error) {
+          throw new Error(`เกิดข้อผิดพลาดในการจัดการรูปภาพ: ${error.message}`);
+        }
       }
 
       const res = await fetch("/api/send-message", {
@@ -207,6 +275,13 @@ async function sendMessageToFoundUsers(event) {
   }
 
   sendMessageLog("🎉 เสร็จสิ้นการส่งข้อความและรูปภาพแล้วค่ะ");
+  
+  // เคลียร์รูปภาพหลังส่งเสร็จ
+  uploadedImageURL = null;
+  const previewImg = document.getElementById('preview-img');
+  const previewWrapper = document.getElementById('preview-image');
+  if (previewImg) previewImg.src = '';
+  if (previewWrapper) previewWrapper.style.display = 'none';
 }
 
 function sendMessageLog(message) {

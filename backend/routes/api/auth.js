@@ -1,6 +1,5 @@
 // routes/api/auth.js
 import express from "express";
-import crypto from "crypto";
 import { loadCredentialsFromDB } from "../../credentials.js";
 
 const router = express.Router();

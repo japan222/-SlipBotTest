@@ -38,7 +38,10 @@
               <img src="https://s.imgz.io/2025/10/19/pngwing.com-1f579652ac9c8637b.png" alt="เลือกรูปภาพ" style="width: 24px; height: 24px;">
             </label>
             <div id="preview-image" class="preview-image" style="display: none;">
-              <img id="preview-img" src="" alt="Preview" />
+              <div class="image-preview-wrapper">
+                <img id="preview-img" src="" alt="Preview" />
+                <button type="button" class="delete-image-btn" onclick="removeImage()" title="ลบรูปภาพ">×</button>
+              </div>
             </div>
 
             <input type="file" id="imageUpload" accept="image/*" style="display: none;" onchange="handleImageSelect(event)">
